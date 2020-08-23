@@ -1,0 +1,139 @@
+﻿@inherits LayoutComponentBase
+
+@using System.Diagnostics
+@using WebApps.Dxf
+@using System.Drawing
+@using WebApps
+
+@implements IDisposable
+
+@inject IJSRuntime jsRuntime
+@inject WebAppContext context
+
+<div id="main">
+    <div id="sidebar">
+        <ShapeListDisplay />
+    </div>
+
+    <div id="main-content">
+        <div class="packer-toolbar">
+
+            Width
+            <input id="@IdList.WidthInputId" class="num-input" type="number" value="500" @onchange="(e => { SetSheetWidth(e.Value.ToString()); sheetWidth = (int) e.Value; })" max="10000"> mm
+
+            Height
+
+            <input id="@IdList.HeightInputId" class="num-input" type="number" value="500" @onchange="(e => { SetSheetHeight(e.Value.ToString()); sheetHeight = (int) e.Value; })" max="10000"> mm
+
+            Spacing
+
+            <input class="num-input mm" type="number" value="0" @onchange="(e => SetSpacing(e.Value.ToString()))" min="0" max="30"> mm
+
+            <button @onclick="StartPack">Pack</button>
+
+            <button @onclick="Save">Save</button>
+
+            <input id="flip-checkbox" type="checkbox" value="false" @onchange="(e => SetAllowFlip(e.Value))" />
+            <label for="flip-checkbox">Allow flip</label>
+
+            <a href="user-guide.html" target="_blank">User guide</a>
+
+            <a href="about.html" target="_blank">About</a>
+
+        </div>
+
+        <div id="packer-overlay" style="@overlayStyle">
+            <p>Shapes packed: @numPacked </p>
+        </div>
+
+        <div id="main-canvas-box">
+            <canvas id="@IdList.MainCanvasId" width="1000" height="500" />
+        </div>
+    </div>
+</div>
+
+@code{
+
+    private int sheetWidth = 500,
+           sheetHeight = 500,
+           spacing = 0,
+           numPacked = 0;
+
+    private bool allowFlip = false;
+
+    private float scale = 1;
+
+    private string overlayStyle = "display: none;";
+
+    private Stopwatch stopwatch = new Stopwatch();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            context.BindJSRuntime(jsRuntime);
+        }
+
+        context.DrawPacker();
+    }
+
+    protected override void OnInitialized()
+    {
+        context.OnShapesChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        context.OnShapesChange -= StateHasChanged;
+    }
+
+    private void SetSheetWidth(string value)
+    {
+        sheetWidth = int.Parse(value);
+        context.ClearDeployment();
+    }
+
+    private void SetSheetHeight(string value)
+    {
+        sheetHeight = int.Parse(value);
+        context.ClearDeployment();
+    }
+
+    private void SetSpacing(string value)
+    {
+        spacing = int.Parse(value);
+        context.ClearDeployment();
+    }
+
+    private void SetAllowFlip(object value)
+    {
+        allowFlip = (bool)value;
+        context.ClearDeployment();
+    }
+
+    private void StartPack()
+    {
+        overlayStyle = "display: block;";
+
+        stopwatch.Start();
+
+        context.Pack(new Point(sheetWidth, sheetHeight), spacing, allowFlip);
+
+        stopwatch.Stop();
+
+        context.js.ConsoleLog("Time taken: " + stopwatch.ElapsedMilliseconds.ToString());
+
+        stopwatch.Reset();
+
+        overlayStyle = "display: none;";
+        numPacked = 0;
+    }
+
+    private void Save()
+    {
+        context.js.ClearFileStroage(IdList.WriterStorageKey);
+        DXFWriter.Write(context);
+        context.js.StorageToFile(IdList.WriterStorageKey);
+    }
+}
+

@@ -1,0 +1,36 @@
+﻿@page "/dxfinput"
+
+@inject WebAppContext context
+
+<button @onclick="LoadExample">Load Example</button>
+
+<div class="file-drop-box" multiple>
+    <p>Drop file here</p>
+    <input id="@IdList.FileInputId" class="file-input" type="file" @onchange="NewFileHandle" @ondrop="NewFileHandle" multiple />
+</div>
+
+@code{
+
+    private string value;
+
+    private async void LoadExample()
+    {
+        context.AddShape(await context.js.GetFromStroage(IdList.ExampleStorageKey));
+    }
+
+    private async void NewFileHandle()
+    {
+
+        var fileList = await context.js.GetFiles();
+
+        for (int i = 0; i < fileList.Length; i++)
+        {
+            context.AddShape(fileList[i]);
+        }
+
+        if (fileList.Length == 0)
+        {
+            context.js.ConsoleLog("Files empty");
+        }
+    }
+}

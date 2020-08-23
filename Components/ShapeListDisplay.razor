@@ -1,0 +1,28 @@
+﻿@page "/shapelistdisplay"
+
+@using WebApps
+
+@implements IDisposable
+
+@inject WebAppContext context
+
+<DXFInput />
+
+@foreach (string key in context.shapes.Keys)
+{
+    <ShapeInterface shapeID="@key" /> 
+}
+
+@code{
+
+    protected override void OnInitialized()
+    {
+        context.OnShapesChange += StateHasChanged;
+        context.shapeListDisplay = this;
+    }
+
+    public void Dispose()
+    {
+        context.OnShapesChange -= StateHasChanged;
+    }
+}

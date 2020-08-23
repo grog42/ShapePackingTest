@@ -1,0 +1,163 @@
+﻿:root {
+    --border-color: grey;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+
+    }
+
+    body{
+        margin: 0;
+    }
+
+#main {
+    display: grid;
+    grid-template-columns: 140px calc(100vw - 140px);
+    grid-template-rows: 100vh;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+#sidebar{
+
+    grid-row: span 2;
+    text-align: center;
+    overflow-y: scroll;
+    padding-top: 10px;
+}
+
+#main-content {
+    grid-column: 2;
+    padding-left: 10px;
+    display: grid;
+    grid-template-rows: 10vh 90vh;
+    width: calc(82vw - 10px);
+    height: 100vh;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+/*Inputs*/
+button{
+    
+}
+
+.num-input{
+    width: 50px;
+}
+
+/*File input*/
+.file-drop-box{
+    display: block;
+    border: dashed 1px var(--border-color);
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+    .file-drop-box p {
+
+        position: relative;
+    }
+
+    .file-input {
+        opacity: 0;
+        width: inherit;
+        height: inherit;
+
+    }
+
+/*Packer*/
+.packer-toolbar {
+    height: 10vh;
+}
+
+.packer-toolbar details {
+    background: white;
+    z-index: 2;
+}
+
+#main-canvas-box {
+    width: calc(82vw - 10px);
+    height: 88vh;
+}
+
+#main-canvas {
+    border: solid 1px var(--border-color);
+    display: block;
+}
+
+#packer-overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 3;
+    text-align: center;
+}
+
+#packer-overlay p{
+    color: aliceblue;
+    font-size: 2em;
+}
+/*Shape interface*/
+.shape-interface-box {
+    display: grid;
+    border: solid var(--border-color) 1px;
+    background: white;
+    width: 100px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+.shape-interface-canvas {
+    grid-column: 1;
+    grid-row: span 1;
+}
+
+.shape-interface-tag {
+    grid-column: 1;
+    height: 25px;
+}
+
+.shape-interface-input {
+    grid-column: 1;
+    width: 50px;
+    height: 25px;
+}

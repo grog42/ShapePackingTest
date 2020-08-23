@@ -1,0 +1,72 @@
+﻿@page "/shapeinterface"
+
+@inject WebAppContext context
+
+@using System.Drawing
+
+<div id="@shapeId" class="shape-interface-box">
+
+    @num
+
+    <canvas class="shape-interface-canvas" id="canvas-@shapeId" width="100" height="100" />
+
+    <small class="shape-interface-tag">Quantity:</small>
+    <input class="shape-interface-input" type="number" @bind-value="quant" @bind-value:event="oninput" @onchange="(() => context.SetShapeQuantity(shapeId, quant))" />
+
+    <small class="shape-interface-tag">Scale:</small>
+    <input class="shape-interface-input" type="number" @bind-value="scale" @bind-value:event="oninput" @onchange="(() => context.SetShapeScale(shapeId, scale))" />
+
+    <button @onclick="((e) => context.RemoveShape(shapeId))">Remove</button>
+</div>
+
+@code{
+
+    [Parameter]
+    public string shapeId { get; set; }
+
+    public int quant;
+    public float scale;
+
+    public int num = 0;
+
+    public bool needReLink = true;
+
+    protected override void OnParametersSet()
+    {
+        context.shapes[shapeId].LinkInterface(this);
+        needReLink = true;
+        quant = context.shapes[shapeId].quantity;
+        scale = context.shapes[shapeId].displayScale;
+    }
+
+    private void LinkCanvas()
+    {
+        context.shapes[shapeId].LinkCanvas(context, "canvas-" + shapeId, new PointF(100, 100), new PointF(0, 0), GetShapeScale());
+        context.js.DrawCanvas("canvas-" + shapeId, context.shapes[this.shapeId].lineIndices);
+        needReLink = false;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (needReLink)
+        {
+            LinkCanvas();
+        }
+        else
+        {
+            context.js.DrawCanvas("canvas-" + shapeId, context.shapes[this.shapeId].lineIndices);
+        }
+    }
+
+    private float GetShapeScale()
+    {
+        PointF size = context.shapes[shapeId].size;
+
+        if (size.X > size.Y)
+        {
+            return (100 / (size.X + 1));
+        }
+
+        return (100 / (size.Y + 1));
+    }
+}
